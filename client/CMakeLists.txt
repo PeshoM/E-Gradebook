@@ -6,6 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
 
-add_executable(e_gradebook main.cpp)
+add_executable(e_gradebook main.cpp Button.cpp)
 
 target_link_libraries(e_gradebook sfml-graphics sfml-window sfml-system) 
