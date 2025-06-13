@@ -1,35 +1,41 @@
-#include "Button.hpp"
+#include <SFML/Graphics.hpp>
+#include <memory>
+#include "BaseWindow.hpp"
+#include "MenuWindow.hpp"
+#include "AddStudentWindow.hpp"
+#include "WindowType.hpp"
+
+std::unique_ptr<BaseWindow> makeWindow(WindowType type)
+{
+    switch (type)
+    {
+        case WindowType::Menu: return std::make_unique<MenuWindow>();
+        default: return std::make_unique<MenuWindow>();
+    }
+}
 
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(800, 600), "E-Gradebook");
     window.setFramerateLimit(60);
 
-    if (!Button::font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
-    {
-        return -1;
-    }
-
-    bool mouse_pressed = false;
+    WindowType currentType = WindowType::Menu;
+    std::unique_ptr<BaseWindow> currentWindow = makeWindow(currentType);
 
     while (window.isOpen())
     {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
+        WindowType nextType = currentType;
 
-            if (event.type == sf::Event::MouseButtonPressed)
-                mouse_pressed = true;
-            if (event.type == sf::Event::MouseButtonReleased)
-                mouse_pressed = false;
+        currentWindow->handleEvents(window, nextType);
+        currentWindow->update();
+
+        if (nextType != currentType)
+        {
+            currentType = nextType;
+            currentWindow = makeWindow(currentType);
         }
 
-        sf::Vector2f mouse_pos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
-
-        window.clear(sf::Color(40, 40, 40));
-        window.display();
+        currentWindow->render(window);
     }
 
     return 0;
