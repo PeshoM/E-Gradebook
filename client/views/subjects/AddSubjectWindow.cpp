@@ -102,7 +102,7 @@ void AddSubjectWindow::add_subject()
         return;
     }
 
-    Subject subject = { name, teacher, room_number};
+    Subject subject = { 0, name, teacher, room_number};
 
     bool success = db->add_subject(subject);
 

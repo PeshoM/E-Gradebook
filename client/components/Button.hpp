@@ -21,4 +21,6 @@ public:
     bool is_mouse_over(const sf::Vector2f &mouse_pos);
     void update(const sf::Vector2f &mouse_pos);
     bool is_clicked(const sf::Vector2f &mouse_pos, bool mouse_pressed);
+    void set_text(const std::string& new_text);
+
 };

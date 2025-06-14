@@ -3,6 +3,7 @@
 #include <nanodbc/nanodbc.h>
 #include "models/student.hpp"
 #include "models/subject.hpp"
+#include "models/grade.hpp"
 #include <string>
 
 class Database
@@ -21,6 +22,8 @@ public:
     bool add_subject(const Subject &subject);
     std::vector<Subject> get_subjects();
     bool delete_student(int id);
+    bool add_grade(const Grade &grade);
+    std::vector<Grade> get_grades();
 
 private:
     nanodbc::connection *conn;

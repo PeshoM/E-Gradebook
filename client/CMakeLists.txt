@@ -27,6 +27,7 @@ add_executable(e_gradebook
     views/students/ViewStudentsWindow.cpp
     views/subjects/AddSubjectWindow.cpp
     views/subjects/ViewSubjectsWindow.cpp
+    views/grades/AddGradeWindow.cpp
     )
 
 target_link_libraries(e_gradebook 

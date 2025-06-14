@@ -106,7 +106,7 @@ void AddStudentWindow::add_student()
 
         std::string db_error;
 
-        Student st = { number_in_class, full_name, date_of_birth};
+        Student st = { 0, number_in_class, full_name, date_of_birth};
 
         bool success = db->add_student(st);
 

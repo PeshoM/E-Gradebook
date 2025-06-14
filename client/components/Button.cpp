@@ -57,3 +57,12 @@ bool Button::is_clicked(const sf::Vector2f &mouse_pos, bool mouse_pressed)
 {
     return is_mouse_over(mouse_pos) && mouse_pressed;
 }
+
+void Button::set_text(const std::string& new_text)
+{
+    text.setString(new_text);
+    sf::FloatRect textBounds = text.getLocalBounds();
+    text.setOrigin(textBounds.width / 2, textBounds.height / 2 + textBounds.top);
+    text.setPosition(shape.getPosition().x + shape.getSize().x / 2,
+                     shape.getPosition().y + shape.getSize().y / 2);
+}
