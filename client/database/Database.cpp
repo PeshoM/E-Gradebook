@@ -155,12 +155,51 @@ std::vector<Student> Database::get_students()
     return students;
 }
 
-bool Database::update_student(int id, const int &number_in_class, const std::string &name, const std::string &email)
+bool Database::update_student(int id, const int &number_in_class, const std::string &name, const std::string &date_of_birth)
 {
+    if (!connected)
+    {
+        std::cerr << "Not connected to database" << std::endl;
+        return false;
+    }
+
+    try
+    {
+        std::ostringstream query;
+        query << "UPDATE students SET number_in_class = " << number_in_class
+              << ", full_name = '" << name << "'"
+              << ", date_of_birth = '" << date_of_birth << "'"
+              << " WHERE id = " << id;
+
+        return execute(query.str());
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Failed to update student: " << e.what() << std::endl;
+        return false;
+    }
 }
 
 bool Database::delete_student(int id)
 {
+    if (!connected)
+    {
+        std::cerr << "Not connected to database" << std::endl;
+        return false;
+    }
+
+    try
+    {
+        std::ostringstream query;
+        query << "DELETE FROM students WHERE id = " << id;
+
+        return execute(query.str());
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Failed to delete student: " << e.what() << std::endl;
+        return false;
+    }
 }
 
 bool Database::add_subject(const Subject &subject)
@@ -170,7 +209,7 @@ bool Database::add_subject(const Subject &subject)
         "VALUES ('" +
         subject.name + "', '" +
         subject.teacher + "', '" + subject.room_number + "')";
-        
+
     return execute(query);
 }
 
