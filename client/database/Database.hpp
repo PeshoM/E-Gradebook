@@ -16,7 +16,7 @@ public:
     bool create_tables();
     bool execute(const std::string &query);
     bool add_student(const Student &student);
-    bool get_students();
+    std::vector<Student> get_students();
     bool update_student(int id, const int &number_in_class, const std::string &name, const std::string &email);
     bool add_subject(const Subject &subject);
     std::vector<Subject> get_subjects();

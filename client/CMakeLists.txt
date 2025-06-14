@@ -24,6 +24,7 @@ add_executable(e_gradebook
     views/MenuWindow.cpp
     database/Database.cpp
     views/students/AddStudentWindow.cpp
+    views/students/ViewStudentsWindow.cpp
     views/subjects/AddSubjectWindow.cpp
     )
 

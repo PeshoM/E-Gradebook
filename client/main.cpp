@@ -4,6 +4,7 @@
 #include "views/MenuWindow.hpp"
 #include "database/Database.hpp"
 #include "views/students/AddStudentWindow.hpp"
+#include "views/students/ViewStudentsWindow.hpp"
 #include "views/subjects/AddSubjectWindow.hpp"
 #include <iostream>
 
@@ -17,6 +18,8 @@ std::unique_ptr<BaseWindow> makeWindow(WindowType type, Database *db)
         return std::make_unique<AddStudentWindow>(db);
     case WindowType::AddSubject:
         return std::make_unique<AddSubjectWindow>(db);
+    case WindowType::ViewStudents:
+        return std::make_unique<ViewStudentsWindow>(db);
     default:
         return std::make_unique<MenuWindow>();
     }

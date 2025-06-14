@@ -119,9 +119,38 @@ bool Database::add_student(const Student &student)
     return execute(query);
 }
 
-bool Database::get_students()
+std::vector<Student> Database::get_students()
 {
+    std::vector<Student> students;
+
+    if (!connected)
+    {
+        std::cerr << "Not connected to database" << std::endl;
+        return students;
+    }
+
+    try
+    {
+        nanodbc::result result = nanodbc::execute(*conn, "SELECT number_in_class, full_name, date_of_birth FROM students");
+
+        while (result.next())
+        {
+            Student s;
+            s.number_in_class = result.get<int>(0);
+            s.full_name = result.get<std::string>(1);
+            s.date_of_birth = result.get<std::string>(2);
+
+            students.push_back(std::move(s));
+        }
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Failed to get students: " << e.what() << std::endl;
+    }
+
+    return students;
 }
+
 
 bool Database::update_student(int id, const int &number_in_class, const std::string &name, const std::string &email)
 {
