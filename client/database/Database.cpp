@@ -245,6 +245,53 @@ std::vector<Subject> Database::get_subjects()
     return subjects;
 }
 
+bool Database::update_subject(int id, const std::string &name, const std::string &teacher, const std::string &room_number)
+{
+    if (!connected)
+    {
+        std::cerr << "Not connected to database" << std::endl;
+        return false;
+    }
+
+    try
+    {
+        std::ostringstream query;
+        query << "UPDATE subjects SET name = '" << name
+              << "', teacher = '" << teacher
+              << "', room_number = '" << room_number
+              << "' WHERE id = " << id;
+
+        return execute(query.str());
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Failed to update subject: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+bool Database::delete_subject(int id)
+{
+    if (!connected)
+    {
+        std::cerr << "Not connected to database" << std::endl;
+        return false;
+    }
+
+    try
+    {
+        std::ostringstream query;
+        query << "DELETE FROM subjects WHERE id = " << id;
+
+        return execute(query.str());
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Failed to delete subject: " << e.what() << std::endl;
+        return false;
+    }
+}
+
 bool Database::add_grade(const Grade &grade)
 {
     std::ostringstream query;

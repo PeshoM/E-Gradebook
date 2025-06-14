@@ -23,6 +23,8 @@ public:
     bool update_student(int id, const int &number_in_class, const std::string &name, const std::string &email);
     bool add_subject(const Subject &subject);
     std::vector<Subject> get_subjects();
+    bool update_subject(int id, const std::string &name, const std::string &teacher, const std::string &room_number);
+    bool delete_subject(int id);
     bool delete_student(int id);
     bool add_grade(const Grade &grade);
     std::vector<GradeByClassNumberEntity> get_grades_by_class_number(int class_number);
