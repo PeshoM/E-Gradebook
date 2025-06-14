@@ -1,8 +1,8 @@
 #pragma once
 
-#include "BaseWindow.hpp"
-#include "WindowType.hpp"
-#include "Button.hpp"
+#include "../components/BaseWindow.hpp"
+#include "../WindowType.hpp"
+#include "../components/Button.hpp"
 #include <vector>
 #include <SFML/Graphics.hpp>
 

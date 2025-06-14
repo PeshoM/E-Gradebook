@@ -1,9 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include "WindowType.hpp"
-#include "BaseWindow.hpp"
-#include "MenuWindow.hpp"
-#include "Database.hpp"
-#include "AddStudentWindow.hpp"
+#include "components/BaseWindow.hpp"
+#include "views/MenuWindow.hpp"
+#include "database/Database.hpp"
+#include "views/students/AddStudentWindow.hpp"
 #include <iostream>
 
 std::unique_ptr<BaseWindow> makeWindow(WindowType type, Database* db)

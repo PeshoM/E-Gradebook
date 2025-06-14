@@ -1,5 +1,6 @@
-#include "Database.hpp"
 #include <iostream>
+#include "Database.hpp"
+#include "models/student.hpp"
 
 Database::Database() : conn(nullptr), connected(false)
 {
@@ -106,13 +107,13 @@ bool Database::create_tables()
     }
 }
 
-bool Database::add_student(const int &number_in_class, const std::string &name, const std::string &date_of_birth)
+bool Database::add_student(const Student &student)
 {
     std::string query =
         "INSERT INTO students (number_in_class, full_name, date_of_birth) "
         "VALUES (" +
-        std::to_string(number_in_class) + ", '" +
-        name + "', '" + date_of_birth + "')";
+        std::to_string(student.number_in_class) + ", '" +
+        student.full_name + "', '" + student.date_of_birth + "')";
 
     return execute(query);
 }

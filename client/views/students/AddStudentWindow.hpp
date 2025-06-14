@@ -2,9 +2,9 @@
 
 #include <SFML/Graphics.hpp>
 #include <string>
-#include "BaseWindow.hpp"
-#include "Button.hpp"
-#include "Database.hpp"
+#include "../../components/BaseWindow.hpp"
+#include "../../components/Button.hpp"
+#include "../../database/Database.hpp"
 
 class AddStudentWindow : public BaseWindow
 {
@@ -25,7 +25,7 @@ private:
 
     bool show_success_message = false;
     sf::Clock success_message_clock;
-    
+
 public:
     AddStudentWindow(Database *database);
 

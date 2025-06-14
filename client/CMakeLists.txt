@@ -19,11 +19,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/nanodbc/nanodbc)
 
 add_executable(e_gradebook
     main.cpp
-    Button.cpp
-    BaseWindow.cpp
-    MenuWindow.cpp
-    Database.cpp
-    AddStudentWindow.cpp)
+    components/Button.cpp
+    components/BaseWindow.cpp
+    views/MenuWindow.cpp
+    database/Database.cpp
+    views/students/AddStudentWindow.cpp)
 
 target_link_libraries(e_gradebook 
     sfml-graphics 
