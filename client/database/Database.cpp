@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Database.hpp"
 #include "models/student.hpp"
+#include "models/subject.hpp"
 
 Database::Database() : conn(nullptr), connected(false)
 {
@@ -50,7 +51,7 @@ bool Database::execute(const std::string &query)
     }
     catch (const std::exception &e)
     {
-        std::cerr << "Query failed: " << e.what() << std::endl;
+        std::cerr << "Query failed: 123" << e.what() << std::endl;
         return false;
     }
 }
@@ -123,6 +124,21 @@ bool Database::get_students()
 }
 
 bool Database::update_student(int id, const int &number_in_class, const std::string &name, const std::string &email)
+{
+}
+
+bool Database::add_subject(const Subject &subject)
+{
+    std::string query =
+        "INSERT INTO subjects (name, teacher, room_number) "
+        "VALUES ('" +
+        subject.name + "', '" +
+        subject.teacher + "', '" + subject.room_number + "')";
+    std::cout << query << std::endl;
+    return execute(query);
+}
+
+std::vector<Subject> Database::get_subjects()
 {
 }
 

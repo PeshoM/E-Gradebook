@@ -1,6 +1,6 @@
+#include <iostream>
 #include "AddStudentWindow.hpp"
 #include "../../database/models/student.hpp"
-#include <iostream>
 
 #define BACKSPACE_UNICODE 8
 
@@ -106,10 +106,8 @@ void AddStudentWindow::add_student()
 
         std::string db_error;
 
-        Student st;
-        st.number_in_class = number_in_class;
-        st.full_name = full_name;
-        st.date_of_birth = date_of_birth;
+        Student st = { number_in_class, full_name, date_of_birth};
+
         bool success = db->add_student(st);
 
         if (success)

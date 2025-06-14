@@ -23,7 +23,9 @@ add_executable(e_gradebook
     components/BaseWindow.cpp
     views/MenuWindow.cpp
     database/Database.cpp
-    views/students/AddStudentWindow.cpp)
+    views/students/AddStudentWindow.cpp
+    views/subjects/AddSubjectWindow.cpp
+    )
 
 target_link_libraries(e_gradebook 
     sfml-graphics 
