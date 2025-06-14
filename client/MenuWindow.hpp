@@ -12,7 +12,7 @@ public:
     std::vector<Button> buttons;
 
     MenuWindow();
-    void handleEvents(sf::RenderWindow &window, WindowType &nextWindow) override;
+    void handle_events(sf::RenderWindow &window, WindowType &nextWindow) override;
     void update() override;
     void render(sf::RenderWindow &window) override;
 };

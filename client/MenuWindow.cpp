@@ -33,7 +33,7 @@ MenuWindow::MenuWindow()
     }
 }
 
-void MenuWindow::handleEvents(sf::RenderWindow &window, WindowType &nextWindow)
+void MenuWindow::handle_events(sf::RenderWindow &window, WindowType &nextWindow)
 {
     sf::Event event;
     while (window.pollEvent(event))

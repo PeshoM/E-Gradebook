@@ -22,7 +22,8 @@ add_executable(e_gradebook
     Button.cpp
     BaseWindow.cpp
     MenuWindow.cpp
-    Database.cpp)
+    Database.cpp
+    AddStudentWindow.cpp)
 
 target_link_libraries(e_gradebook 
     sfml-graphics 

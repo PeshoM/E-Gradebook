@@ -68,7 +68,7 @@ bool Database::create_tables()
             IF OBJECT_ID('students', 'U') IS NULL
             CREATE TABLE students (
                 id INT IDENTITY(1,1) PRIMARY KEY,
-                number_in_class INT NOT NULL,
+                number_in_class INT NOT NULL UNIQUE,
                 full_name NVARCHAR(100) NOT NULL,
                 date_of_birth DATE NOT NULL
             )
@@ -78,7 +78,7 @@ bool Database::create_tables()
             IF OBJECT_ID('subjects', 'U') IS NULL
             CREATE TABLE subjects (
                 id INT IDENTITY(1,1) PRIMARY KEY,
-                name NVARCHAR(100) NOT NULL,
+                name NVARCHAR(100) NOT NULL UNIQUE,
                 teacher NVARCHAR(100) NOT NULL,
                 room_number NVARCHAR(50) NOT NULL
             )
@@ -108,6 +108,13 @@ bool Database::create_tables()
 
 bool Database::add_student(const int &number_in_class, const std::string &name, const std::string &date_of_birth)
 {
+    std::string query =
+        "INSERT INTO students (number_in_class, full_name, date_of_birth) "
+        "VALUES (" +
+        std::to_string(number_in_class) + ", '" +
+        name + "', '" + date_of_birth + "')";
+
+    return execute(query);
 }
 
 bool Database::get_students()
