@@ -143,14 +143,13 @@ std::vector<Student> Database::get_students()
             students.push_back(std::move(s));
         }
     }
-    catch (const std::exception& e)
+    catch (const std::exception &e)
     {
         std::cerr << "Failed to get students: " << e.what() << std::endl;
     }
 
     return students;
 }
-
 
 bool Database::update_student(int id, const int &number_in_class, const std::string &name, const std::string &email)
 {
@@ -169,6 +168,33 @@ bool Database::add_subject(const Subject &subject)
 
 std::vector<Subject> Database::get_subjects()
 {
+    std::vector<Subject> subjects;
+
+    if (!connected)
+    {
+        std::cerr << "Not connected to database" << std::endl;
+        return subjects;
+    }
+
+    try
+    {
+        nanodbc::result result = nanodbc::execute(*conn, "SELECT name, teacher, room_number FROM subjects");
+
+        while (result.next())
+        {
+            Subject subj;
+            subj.name = result.get<std::string>("name");
+            subj.teacher = result.get<std::string>("teacher");
+            subj.room_number = result.get<std::string>("room_number");
+            subjects.push_back(subj);
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Query failed: " << e.what() << std::endl;
+    }
+
+    return subjects;
 }
 
 bool Database::delete_student(int id)
