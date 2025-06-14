@@ -304,6 +304,51 @@ bool Database::add_grade(const Grade &grade)
     return execute(query.str());
 }
 
+bool Database::update_grade(int id, float grade_value)
+{
+    if (!connected)
+    {
+        std::cerr << "Not connected to database" << std::endl;
+        return false;
+    }
+
+    try
+    {
+        std::ostringstream query;
+        query << "UPDATE grades SET grade_value = " << grade_value
+              << " WHERE id = " << id;
+
+        return execute(query.str());
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Failed to update grade: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+bool Database::delete_grade(int id)
+{
+    if (!connected)
+    {
+        std::cerr << "Not connected to database" << std::endl;
+        return false;
+    }
+
+    try
+    {
+        std::ostringstream query;
+        query << "DELETE FROM grades WHERE id = " << id;
+
+        return execute(query.str());
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Failed to delete grade: " << e.what() << std::endl;
+        return false;
+    }
+}
+
 std::vector<GradeByClassNumberEntity> Database::get_grades_by_class_number(int class_number)
 {
     std::vector<GradeByClassNumberEntity> grades;
@@ -318,7 +363,7 @@ std::vector<GradeByClassNumberEntity> Database::get_grades_by_class_number(int c
     {
         nanodbc::statement stmt(*conn);
         stmt.prepare(R"(
-            SELECT subj.name, g.grade_value, CONVERT(varchar, g.date, 23) as date_str
+            SELECT g.id, subj.name, g.grade_value, CONVERT(varchar, g.date, 23) as date_str
             FROM students st
             JOIN grades g ON g.student_id = st.id
             JOIN subjects subj ON subj.id = g.subject_id
@@ -333,8 +378,7 @@ std::vector<GradeByClassNumberEntity> Database::get_grades_by_class_number(int c
         while (result.next())
         {
             GradeByClassNumberEntity g;
-            sf::Text subject_name, grade_value, date_str;
-
+            g.id = result.get<int>("id");
             g.subject_name = result.get<std::string>("name");
             g.grade_value = result.get<float>("grade_value");
             g.date = result.get<std::string>("date_str");

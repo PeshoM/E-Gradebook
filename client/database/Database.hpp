@@ -28,6 +28,8 @@ public:
     bool delete_student(int id);
     bool add_grade(const Grade &grade);
     std::vector<GradeByClassNumberEntity> get_grades_by_class_number(int class_number);
+    bool update_grade(int id, float grade_value);
+    bool delete_grade(int id);
 
 private:
     nanodbc::connection *conn;
