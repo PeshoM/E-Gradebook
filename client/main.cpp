@@ -8,6 +8,7 @@
 #include "views/subjects/AddSubjectWindow.hpp"
 #include "views/subjects/ViewSubjectsWindow.hpp"
 #include "views/grades/AddGradeWindow.hpp"
+#include "views/grades/ViewGradesWindow.hpp"
 #include <iostream>
 
 std::unique_ptr<BaseWindow> makeWindow(WindowType type, Database *db)
@@ -26,6 +27,8 @@ std::unique_ptr<BaseWindow> makeWindow(WindowType type, Database *db)
         return std::make_unique<ViewSubjectsWindow>(db);
     case WindowType::AddGrade:
         return std::make_unique<AddGradeWindow>(db);
+    case WindowType::ViewGrades:
+        return std::make_unique<ViewGradesWindow>(db);
     default:
         return std::make_unique<MenuWindow>();
     }

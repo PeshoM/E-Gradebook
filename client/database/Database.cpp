@@ -3,6 +3,8 @@
 #include "models/student.hpp"
 #include "models/subject.hpp"
 #include <sstream>
+#include <SFML/Graphics.hpp>
+#include "responses/gradesByClassNumber.hpp"
 
 Database::Database() : conn(nullptr), connected(false)
 {
@@ -168,7 +170,7 @@ bool Database::add_subject(const Subject &subject)
         "VALUES ('" +
         subject.name + "', '" +
         subject.teacher + "', '" + subject.room_number + "')";
-    std::cout << query << std::endl;
+        
     return execute(query);
 }
 
@@ -216,9 +218,9 @@ bool Database::add_grade(const Grade &grade)
     return execute(query.str());
 }
 
-std::vector<Grade> Database::get_grades()
+std::vector<GradeByClassNumberEntity> Database::get_grades_by_class_number(int class_number)
 {
-    std::vector<Grade> grades;
+    std::vector<GradeByClassNumberEntity> grades;
 
     if (!connected)
     {
@@ -228,16 +230,28 @@ std::vector<Grade> Database::get_grades()
 
     try
     {
-        nanodbc::result result = nanodbc::execute(*conn, "SELECT student_id, subject_id, date, grade_value FROM grades");
+        nanodbc::statement stmt(*conn);
+        stmt.prepare(R"(
+            SELECT subj.name, g.grade_value, CONVERT(varchar, g.date, 23) as date_str
+            FROM students st
+            JOIN grades g ON g.student_id = st.id
+            JOIN subjects subj ON subj.id = g.subject_id
+            WHERE st.number_in_class = ?
+            ORDER BY g.date DESC
+        )");
+
+        stmt.bind(0, &class_number);
+
+        nanodbc::result result = stmt.execute();
 
         while (result.next())
         {
-            Grade g;
-            g.student_id = result.get<int>("student_id");
-            g.subject_id = result.get<int>("subject_id");
-            g.date = result.get<std::string>("date");
+            GradeByClassNumberEntity g;
+            sf::Text subject_name, grade_value, date_str;
+
+            g.subject_name = result.get<std::string>("name");
             g.grade_value = result.get<float>("grade_value");
-            std:: cout << "student_id: " << g.student_id << ", grade: " << g.grade_value << ", time: " << g.date << std::endl;
+            g.date = result.get<std::string>("date_str");
 
             grades.push_back(g);
         }

@@ -4,6 +4,8 @@
 #include "models/student.hpp"
 #include "models/subject.hpp"
 #include "models/grade.hpp"
+#include "models/gradeEntry.hpp"
+#include "responses/gradesByClassNumber.hpp"
 #include <string>
 
 class Database
@@ -23,7 +25,7 @@ public:
     std::vector<Subject> get_subjects();
     bool delete_student(int id);
     bool add_grade(const Grade &grade);
-    std::vector<Grade> get_grades();
+    std::vector<GradeByClassNumberEntity> get_grades_by_class_number(int class_number);
 
 private:
     nanodbc::connection *conn;
