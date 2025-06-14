@@ -22,7 +22,7 @@ Button::~Button()
 {
 }
 
-void Button::draw(sf::RenderWindow &window)
+void Button::draw(sf::RenderWindow &window) const
 {
     window.draw(shape);
     window.draw(text);

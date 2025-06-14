@@ -1,12 +1,10 @@
-#ifndef SUBJECT_HPP
-#define SUBJECT_HPP
+#pragma once
 
 #include <string>
 
-struct Subject {
+struct Subject
+{
     std::string name;
     std::string teacher;
-    std::string roomNumber;
+    std::string room_number;
 };
-
-#endif

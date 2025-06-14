@@ -1,12 +1,10 @@
-#ifndef STUDENT_HPP
-#define STUDENT_HPP
+#pragma once
 
 #include <string>
 
-struct Student {
-    int numberInClass;
-    std::string fullName;
-    std::string dateOfBirth;
+struct Student
+{
+    int number_in_class;
+    std::string full_name;
+    std::string date_of_birth;
 };
-
-#endif

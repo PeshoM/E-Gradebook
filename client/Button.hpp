@@ -1,4 +1,5 @@
 #pragma once
+
 #include <SFML/Graphics.hpp>
 #include <string>
 
@@ -16,7 +17,7 @@ public:
 
     ~Button();
 
-    void draw(sf::RenderWindow &window);
+    void draw(sf::RenderWindow &window) const;
     bool is_mouse_over(const sf::Vector2f &mouse_pos);
     void update(const sf::Vector2f &mouse_pos);
     bool is_clicked(const sf::Vector2f &mouse_pos, bool mouse_pressed);

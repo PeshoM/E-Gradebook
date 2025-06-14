@@ -1,13 +1,11 @@
-#ifndef GRADE_HPP
-#define GRADE_HPP
+#pragma once
 
 #include <string>
 
-struct Grade {
-    int studentId;
-    int subjectId;
+struct Grade
+{
+    int student_id;
+    int subject_id;
     std::string date;
-    float gradeValue;
+    float grade_value;
 };
-
-#endif
