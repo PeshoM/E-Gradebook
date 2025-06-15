@@ -4,9 +4,12 @@
 MoreStudentsInfoWindow::MoreStudentsInfoWindow(Database *database)
     : db(database), close_window(false), scroll_offset(0.f), showing_list(false)
 {
-    if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
+    if (!font.loadFromFile("arial.ttf") &&
+        !font.loadFromFile("C:/Windows/Fonts/arial.ttf") &&
+        !font.loadFromFile("/System/Library/Fonts/Arial.ttf") &&
+        !font.loadFromFile("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"))
     {
-        std::cerr << "Failed to load font.\n";
+        std::cerr << "Warning: Could not load any system font. Using default rendering.\n";
     }
 
     setup_buttons();

@@ -3,9 +3,12 @@
 
 MenuWindow::MenuWindow()
 {
-    if (!Button::font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
+    if (!Button::font.loadFromFile("arial.ttf") &&
+        !Button::font.loadFromFile("C:/Windows/Fonts/arial.ttf") &&
+        !Button::font.loadFromFile("/System/Library/Fonts/Arial.ttf") &&
+        !Button::font.loadFromFile("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"))
     {
-        std::cerr << "Error loading font.\n";
+        std::cerr << "Warning: Could not load any system font. Using default rendering.\n";
     }
 
     title_text.setFont(Button::font);
@@ -50,8 +53,7 @@ MenuWindow::MenuWindow()
         buttons.back().setColors(
             sf::Color(70, 70, 130),
             sf::Color(90, 90, 160),
-            sf::Color(110, 110, 190) 
-        );
+            sf::Color(110, 110, 190));
 
         ++index;
     }

@@ -11,13 +11,16 @@ AddStudentWindow::AddStudentWindow(Database *database)
       selected_box_index(-1),
       show_success_message(false)
 {
-    if (!Button::font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
+    if (!Button::font.loadFromFile("arial.ttf") &&
+        !Button::font.loadFromFile("C:/Windows/Fonts/arial.ttf") &&
+        !Button::font.loadFromFile("/System/Library/Fonts/Arial.ttf") &&
+        !Button::font.loadFromFile("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"))
     {
-        std::cerr << "Error loading font.\n";
+        std::cerr << "Warning: Could not load any system font. Using default rendering.\n";
     }
 
     const std::string labels[] = {
-        "Number in Class:", "Full Name:", "Date of Birth:"};
+        "Number in Class (1+):", "Full Name:", "Date of Birth:"};
 
     for (int i = 0; i < 3; ++i)
     {
@@ -84,9 +87,22 @@ void AddStudentWindow::handle_events(sf::RenderWindow &window, WindowType &next_
                 if (!input_values[selected_box_index].empty())
                     input_values[selected_box_index].pop_back();
             }
-            else if (event.text.unicode < 128)
+            else if (event.text.unicode < 128 && std::isprint(event.text.unicode))
             {
-                input_values[selected_box_index] += static_cast<char>(event.text.unicode);
+                if (selected_box_index == 0)
+                {
+                    if (event.text.unicode >= '0' && event.text.unicode <= '9')
+                    {
+                        if (!(input_values[0].empty() && event.text.unicode == '0'))
+                        {
+                            input_values[selected_box_index] += static_cast<char>(event.text.unicode);
+                        }
+                    }
+                }
+                else
+                {
+                    input_values[selected_box_index] += static_cast<char>(event.text.unicode);
+                }
             }
 
             input_texts[selected_box_index].setString(input_values[selected_box_index]);
@@ -100,9 +116,37 @@ void AddStudentWindow::add_student()
 
     try
     {
+        // Validate class number input
+        if (input_values[0].empty())
+        {
+            error_message = "Class number is required.";
+            return;
+        }
+
         int number_in_class = std::stoi(input_values[0]);
+
+        // Ensure class number is at least 1
+        if (number_in_class < 1)
+        {
+            error_message = "Class number must be at least 1.";
+            return;
+        }
+
         const std::string &full_name = input_values[1];
         const std::string &date_of_birth = input_values[2];
+
+        // Validate other required fields
+        if (full_name.empty())
+        {
+            error_message = "Full name is required.";
+            return;
+        }
+
+        if (date_of_birth.empty())
+        {
+            error_message = "Date of birth is required.";
+            return;
+        }
 
         std::string db_error;
 

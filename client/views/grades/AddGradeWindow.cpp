@@ -19,9 +19,12 @@ AddGradeWindow::AddGradeWindow(Database *db)
       selected_box_index(-1),
       show_success_message(false)
 {
-    if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
+    if (!font.loadFromFile("arial.ttf") &&
+        !font.loadFromFile("C:/Windows/Fonts/arial.ttf") &&
+        !font.loadFromFile("/System/Library/Fonts/Arial.ttf") &&
+        !font.loadFromFile("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"))
     {
-        std::cerr << "Failed to load font.\n";
+        std::cerr << "Warning: Could not load any system font. Using default rendering.\n";
     }
 
     const std::string labels[] = {
@@ -30,7 +33,7 @@ AddGradeWindow::AddGradeWindow(Database *db)
     for (int i = 0; i < 3; ++i)
     {
         input_boxes[i].setSize({300, 40});
-        input_boxes[i].setPosition({250, 40 + i * 80});
+        input_boxes[i].setPosition({250, 80 + i * 80});
         input_boxes[i].setFillColor(sf::Color(90, 90, 160));
         input_boxes[i].setOutlineColor(sf::Color(100, 100, 180));
         input_boxes[i].setOutlineThickness(2);
@@ -39,12 +42,12 @@ AddGradeWindow::AddGradeWindow(Database *db)
         input_labels[i].setCharacterSize(18);
         input_labels[i].setFillColor(sf::Color(220, 220, 255));
         input_labels[i].setString(labels[i]);
-        input_labels[i].setPosition({250, 10 + i * 80});
+        input_labels[i].setPosition({250, 50 + i * 80});
 
         input_texts[i].setFont(font);
         input_texts[i].setCharacterSize(18);
         input_texts[i].setFillColor(sf::Color(220, 220, 255));
-        input_texts[i].setPosition({260, 50 + i * 80});
+        input_texts[i].setPosition({260, 90 + i * 80});
 
         input_values[i] = "";
     }
@@ -52,7 +55,7 @@ AddGradeWindow::AddGradeWindow(Database *db)
     error_text.setFont(font);
     error_text.setCharacterSize(20);
     error_text.setFillColor(sf::Color(255, 100, 100));
-    error_text.setPosition({250, 280});
+    error_text.setPosition({250, 320});
 
     students = db->get_students();
     subjects = db->get_subjects();
@@ -235,7 +238,7 @@ void AddGradeWindow::render(sf::RenderWindow &window)
         sf::FloatRect textRect = error_text.getLocalBounds();
         error_text.setOrigin(textRect.left + textRect.width / 2.0f,
                              textRect.top + textRect.height / 2.0f);
-        error_text.setPosition(window.getSize().x / 2.0f, 280);
+        error_text.setPosition(window.getSize().x / 2.0f, 320);
         window.draw(error_text);
     }
 
@@ -252,7 +255,7 @@ void AddGradeWindow::render(sf::RenderWindow &window)
             sf::FloatRect textRect = success_text.getLocalBounds();
             success_text.setOrigin(textRect.left + textRect.width / 2.0f,
                                    textRect.top + textRect.height / 2.0f);
-            success_text.setPosition(window.getSize().x / 2.0f, 80);
+            success_text.setPosition(window.getSize().x / 2.0f, 400);
 
             window.draw(success_text);
         }

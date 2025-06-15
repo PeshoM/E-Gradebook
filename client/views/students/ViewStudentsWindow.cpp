@@ -6,9 +6,12 @@
 ViewStudentsWindow::ViewStudentsWindow(Database *database)
     : db(database), scroll_offset(0.f), show_modal(false), input_active(false), editing_student_id(-1), show_error(false)
 {
-    if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
+    if (!font.loadFromFile("arial.ttf") &&
+        !font.loadFromFile("C:/Windows/Fonts/arial.ttf") &&
+        !font.loadFromFile("/System/Library/Fonts/Arial.ttf") &&
+        !font.loadFromFile("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"))
     {
-        std::cerr << "Failed to load font.\n";
+        std::cerr << "Warning: Could not load any system font. Using default rendering.\n";
     }
 
     back_button.setSize({150, 40});

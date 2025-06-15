@@ -39,7 +39,7 @@ std::unique_ptr<BaseWindow> makeWindow(WindowType type, Database *db)
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "E-Gradebook");
+    sf::RenderWindow window(sf::VideoMode(800, 600), "E-Gradebook", sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(60);
 
     Database db;

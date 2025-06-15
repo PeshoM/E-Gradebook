@@ -12,9 +12,12 @@ ViewGradesWindow::ViewGradesWindow(Database *database)
       show_modal(false), editing_grade_id(-1), show_error(false),
       subject_input_active(false), current_subject_avg(0.0f), current_overall_avg(0.0f)
 {
-    if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
+    if (!font.loadFromFile("arial.ttf") &&
+        !font.loadFromFile("C:/Windows/Fonts/arial.ttf") &&
+        !font.loadFromFile("/System/Library/Fonts/Arial.ttf") &&
+        !font.loadFromFile("/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"))
     {
-        std::cerr << "Failed to load font.\n";
+        std::cerr << "Warning: Could not load any system font. Using default rendering.\n";
     }
 
     back_button.setSize({150, 40});
@@ -179,6 +182,8 @@ void ViewGradesWindow::show_edit_modal(int grade_id)
     editing_grade_id = grade_id;
     show_modal = true;
     input_active = true;
+    show_error = false;
+    subject_input_active = false;
 
     auto it = std::find_if(grades.begin(), grades.end(),
                            [grade_id](const GradeEntry &g)
@@ -187,6 +192,11 @@ void ViewGradesWindow::show_edit_modal(int grade_id)
     {
         input_string_grade = it->grade_value.getString();
         input_text_grade.setString(input_string_grade);
+    }
+    else
+    {
+        input_string_grade.clear();
+        input_text_grade.setString("");
     }
 }
 
@@ -268,6 +278,12 @@ void ViewGradesWindow::handle_modal_events(sf::RenderWindow &window)
     sf::Event event;
     while (window.pollEvent(event))
     {
+        if (event.type == sf::Event::Closed)
+        {
+            window.close();
+            return;
+        }
+
         if (event.type == sf::Event::MouseButtonPressed)
         {
             sf::Vector2f mouse_pos(event.mouseButton.x, event.mouseButton.y);
@@ -283,19 +299,39 @@ void ViewGradesWindow::handle_modal_events(sf::RenderWindow &window)
                 input_active = false;
                 editing_grade_id = -1;
                 show_error = false;
+                input_string_grade.clear();
                 return;
             }
             else if (input_box_grade.getGlobalBounds().contains(mouse_pos))
             {
                 input_active = true;
             }
-            else
+            else if (!modal_window.getGlobalBounds().contains(mouse_pos))
             {
+                // Only deactivate input if clicking outside the modal window
                 input_active = false;
             }
         }
 
-        if (input_active && event.type == sf::Event::TextEntered)
+        if (event.type == sf::Event::KeyPressed)
+        {
+            if (event.key.code == sf::Keyboard::Escape)
+            {
+                show_modal = false;
+                input_active = false;
+                editing_grade_id = -1;
+                show_error = false;
+                input_string_grade.clear();
+                return;
+            }
+            else if (event.key.code == sf::Keyboard::Enter)
+            {
+                save_grade_changes();
+                return;
+            }
+        }
+
+        if (event.type == sf::Event::TextEntered)
         {
             if (event.text.unicode == BACKSPACE_UNICODE)
             {
@@ -360,89 +396,110 @@ void ViewGradesWindow::handle_events(sf::RenderWindow &window, WindowType &next_
             {
                 input_active = true;
                 subject_input_active = false;
+                // Allow re-entering class number by resetting class_entered
+                if (class_entered)
+                {
+                    class_entered = false;
+                    grades.clear();
+                    scroll_offset = 0.f;
+                    subject_avg_text.setString("Subject Avg: N/A");
+                    overall_avg_text.setString("Overall Avg: N/A");
+                }
             }
             else if (subject_input_box.getGlobalBounds().contains(mouse_pos))
             {
                 input_active = false;
                 subject_input_active = true;
             }
-            else if (class_entered)
+            else
             {
-                for (size_t i = 0; i < row_buttons.size(); ++i)
+                // Deactivate input boxes if clicking elsewhere
+                input_active = false;
+                subject_input_active = false;
+
+                // Check row buttons only if class is entered
+                if (class_entered)
                 {
-                    float y_pos = 160.f + i * row_height - scroll_offset;
-                    if (y_pos + row_height < 0.f || y_pos > window.getSize().y)
-                        continue;
-
-                    row_buttons[i].edit_button.setPosition(650.f, y_pos + 7.5f);
-                    row_buttons[i].delete_button.setPosition(720.f, y_pos + 7.5f);
-                    row_buttons[i].edit_text.setPosition(660.f, y_pos + 10.f);
-                    row_buttons[i].delete_text.setPosition(730.f, y_pos + 10.f);
-
-                    if (row_buttons[i].edit_button.getGlobalBounds().contains(mouse_pos))
+                    float table_start_y = 180.f;
+                    for (size_t i = 0; i < row_buttons.size(); ++i)
                     {
-                        show_edit_modal(grades[i].id);
-                        break;
-                    }
-                    else if (row_buttons[i].delete_button.getGlobalBounds().contains(mouse_pos))
-                    {
-                        delete_grade(grades[i].id);
-                        break;
+                        float y_pos = table_start_y + (i + 1) * row_height - scroll_offset;
+                        if (y_pos + row_height < table_start_y || y_pos > window.getSize().y)
+                            continue;
+
+                        // Set button positions to match render positions
+                        row_buttons[i].edit_button.setPosition(650.f, y_pos + 7.5f);
+                        row_buttons[i].delete_button.setPosition(720.f, y_pos + 7.5f);
+
+                        if (row_buttons[i].edit_button.getGlobalBounds().contains(mouse_pos))
+                        {
+                            show_edit_modal(grades[i].id);
+                            break;
+                        }
+                        else if (row_buttons[i].delete_button.getGlobalBounds().contains(mouse_pos))
+                        {
+                            delete_grade(grades[i].id);
+                            break;
+                        }
                     }
                 }
             }
         }
 
-        if (input_active && !class_entered && event.type == sf::Event::TextEntered)
+        if (event.type == sf::Event::TextEntered)
         {
-            if (event.text.unicode >= '0' && event.text.unicode <= '9')
+            if (input_active)
             {
-                class_input_string.push_back(static_cast<char>(event.text.unicode));
-                class_input_text.setString(class_input_string);
-            }
-            else if (event.text.unicode == BACKSPACE_UNICODE)
-            {
-                if (!class_input_string.empty())
+                if (event.text.unicode >= '0' && event.text.unicode <= '9')
                 {
-                    class_input_string.pop_back();
-                    if (class_input_string.empty())
-                        class_input_text.setString("Enter Class Number...");
-                    else
-                        class_input_text.setString(class_input_string);
+                    class_input_string.push_back(static_cast<char>(event.text.unicode));
+                    class_input_text.setString(class_input_string);
+                }
+                else if (event.text.unicode == BACKSPACE_UNICODE)
+                {
+                    if (!class_input_string.empty())
+                    {
+                        class_input_string.pop_back();
+                        if (class_input_string.empty())
+                            class_input_text.setString("Enter Class Number...");
+                        else
+                            class_input_text.setString(class_input_string);
+                    }
+                }
+                else if (event.text.unicode == ENTER_UNICODE)
+                {
+                    if (!class_input_string.empty())
+                    {
+                        input_active = false;
+                        class_entered = true;
+                        load_grades_for_class(class_input_string);
+                        update_averages();
+                    }
                 }
             }
-            else if (event.text.unicode == ENTER_UNICODE)
+            else if (subject_input_active)
             {
-                if (!class_input_string.empty())
+                if (event.text.unicode == BACKSPACE_UNICODE)
                 {
-                    input_active = false;
-                    class_entered = true;
-                    load_grades_for_class(class_input_string);
+                    if (!subject_input_string.empty())
+                    {
+                        subject_input_string.pop_back();
+                        if (subject_input_string.empty())
+                            subject_input_text.setString("Enter Subject...");
+                        else
+                            subject_input_text.setString(subject_input_string);
+                    }
+                }
+                else if (event.text.unicode == ENTER_UNICODE)
+                {
+                    subject_input_active = false;
                     update_averages();
                 }
-            }
-        }
-        else if (subject_input_active && event.type == sf::Event::TextEntered)
-        {
-            if (event.text.unicode == BACKSPACE_UNICODE)
-            {
-                if (!subject_input_string.empty())
+                else if (event.text.unicode >= 32 && event.text.unicode <= 126)
                 {
-                    subject_input_string.pop_back();
-                    if (subject_input_string.empty())
-                        subject_input_text.setString("Enter Subject...");
-                    else
-                        subject_input_text.setString(subject_input_string);
+                    subject_input_string.push_back(static_cast<char>(event.text.unicode));
+                    subject_input_text.setString(subject_input_string);
                 }
-            }
-            else if (event.text.unicode == ENTER_UNICODE)
-            {
-                update_averages();
-            }
-            else if (event.text.unicode >= 32 && event.text.unicode <= 126)
-            {
-                subject_input_string.push_back(static_cast<char>(event.text.unicode));
-                subject_input_text.setString(subject_input_string);
             }
         }
 
@@ -521,27 +578,35 @@ void ViewGradesWindow::render(sf::RenderWindow &window)
             header_subject.setCharacterSize(22);
             header_subject.setFillColor(sf::Color::Yellow);
             header_subject.setString("Subject");
-            header_subject.setPosition(30.f, 180.f);
+            header_subject.setPosition(30.f, table_start_y);
 
             header_grade.setFont(font);
             header_grade.setCharacterSize(22);
             header_grade.setFillColor(sf::Color::Yellow);
             header_grade.setString("Grade");
-            header_grade.setPosition(400.f, 180.f);
+            header_grade.setPosition(400.f, table_start_y);
 
             header_date.setFont(font);
             header_date.setCharacterSize(22);
             header_date.setFillColor(sf::Color::Yellow);
             header_date.setString("Date");
-            header_date.setPosition(500.f, 180.f);
+            header_date.setPosition(500.f, table_start_y);
+
+            sf::Text header_actions;
+            header_actions.setFont(font);
+            header_actions.setCharacterSize(22);
+            header_actions.setFillColor(sf::Color::Yellow);
+            header_actions.setString("Actions");
+            header_actions.setPosition(650.f, table_start_y);
 
             window.draw(header_subject);
             window.draw(header_grade);
             window.draw(header_date);
+            window.draw(header_actions);
 
             for (std::size_t i = 0; i < grades.size(); ++i)
             {
-                float y_pos = table_start_y + i * row_height - scroll_offset;
+                float y_pos = table_start_y + (i + 1) * row_height - scroll_offset;
 
                 if (y_pos + row_height < visible_area_top || y_pos > visible_area_bottom)
                     continue;
@@ -560,6 +625,7 @@ void ViewGradesWindow::render(sf::RenderWindow &window)
                 window.draw(grades[i].grade_value);
                 window.draw(grades[i].grade_date);
 
+                // Set button positions consistently
                 row_buttons[i].edit_button.setPosition(650.f, y_pos + 7.5f);
                 row_buttons[i].delete_button.setPosition(720.f, y_pos + 7.5f);
                 row_buttons[i].edit_text.setPosition(660.f, y_pos + 10.f);
