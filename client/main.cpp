@@ -1,10 +1,11 @@
 #include <SFML/Graphics.hpp>
 #include "WindowType.hpp"
 #include "components/BaseWindow.hpp"
-#include "views/MenuWindow.hpp"
 #include "database/Database.hpp"
+#include "views/MenuWindow.hpp"
 #include "views/students/AddStudentWindow.hpp"
 #include "views/students/ViewStudentsWindow.hpp"
+#include "views/students/MoreStudentsInfoWindow.hpp"
 #include "views/subjects/AddSubjectWindow.hpp"
 #include "views/subjects/ViewSubjectsWindow.hpp"
 #include "views/grades/AddGradeWindow.hpp"
@@ -29,6 +30,8 @@ std::unique_ptr<BaseWindow> makeWindow(WindowType type, Database *db)
         return std::make_unique<AddGradeWindow>(db);
     case WindowType::ViewGrades:
         return std::make_unique<ViewGradesWindow>(db);
+    case WindowType::MoreStudentsInfoWindow:
+        return std::make_unique<MoreStudentsInfoWindow>(db);
     default:
         return std::make_unique<MenuWindow>();
     }

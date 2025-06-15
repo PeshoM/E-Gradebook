@@ -8,6 +8,13 @@
 #include "responses/gradesByClassNumber.hpp"
 #include <string>
 
+struct RemedialExamStudent
+{
+    Student student;
+    std::string subject_name;
+    float average_grade;
+};
+
 class Database
 {
 public:
@@ -32,6 +39,11 @@ public:
     bool delete_grade(int id);
     float get_subject_average(int class_number, const std::string &subject_name);
     float get_overall_average(int class_number);
+
+    std::vector<Student> get_top_students();
+    std::vector<RemedialExamStudent> get_remedial_exam_students();
+    std::vector<Student> get_failing_students();
+    std::vector<Student> get_birthday_students();
 
 private:
     nanodbc::connection *conn;

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <SFML/Graphics.hpp>
 #include "responses/gradesByClassNumber.hpp"
+#include <ctime>
 
 Database::Database() : conn(nullptr), connected(false)
 {
@@ -464,4 +465,189 @@ float Database::get_overall_average(int class_number)
     }
 
     return 0.0f;
+}
+
+std::vector<Student> Database::get_top_students()
+{
+    std::vector<Student> students;
+
+    if (!connected)
+    {
+        std::cerr << "Not connected to database" << std::endl;
+        return students;
+    }
+
+    try
+    {
+        nanodbc::statement stmt(*conn);
+        stmt.prepare(R"(
+            SELECT DISTINCT s.id, s.number_in_class, s.full_name, s.date_of_birth, AVG(g.grade_value) as avg_grade
+            FROM students s
+            JOIN grades g ON g.student_id = s.id
+            GROUP BY s.id, s.number_in_class, s.full_name, s.date_of_birth
+            HAVING AVG(g.grade_value) > 5.50
+            ORDER BY AVG(g.grade_value) DESC
+        )");
+
+        nanodbc::result result = stmt.execute();
+
+        while (result.next())
+        {
+            Student s;
+            s.id = result.get<int>("id");
+            s.number_in_class = result.get<int>("number_in_class");
+            s.full_name = result.get<std::string>("full_name");
+            s.date_of_birth = result.get<std::string>("date_of_birth");
+            students.push_back(s);
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Failed to get top students: " << e.what() << std::endl;
+    }
+
+    return students;
+}
+
+std::vector<RemedialExamStudent> Database::get_remedial_exam_students()
+{
+    std::vector<RemedialExamStudent> students;
+
+    if (!connected)
+    {
+        std::cerr << "Not connected to database" << std::endl;
+        return students;
+    }
+
+    try
+    {
+        nanodbc::statement stmt(*conn);
+        stmt.prepare(R"(
+            SELECT s.id, s.number_in_class, s.full_name, s.date_of_birth, 
+                   subj.name as subject_name, AVG(g.grade_value) as avg_grade
+            FROM students s
+            JOIN grades g ON g.student_id = s.id
+            JOIN subjects subj ON subj.id = g.subject_id
+            GROUP BY s.id, s.number_in_class, s.full_name, s.date_of_birth, subj.id, subj.name
+            HAVING AVG(g.grade_value) < 3.00
+            ORDER BY s.number_in_class, subj.name
+        )");
+
+        nanodbc::result result = stmt.execute();
+
+        while (result.next())
+        {
+            RemedialExamStudent res;
+            res.student.id = result.get<int>("id");
+            res.student.number_in_class = result.get<int>("number_in_class");
+            res.student.full_name = result.get<std::string>("full_name");
+            res.student.date_of_birth = result.get<std::string>("date_of_birth");
+            res.subject_name = result.get<std::string>("subject_name");
+            res.average_grade = result.get<float>("avg_grade");
+            students.push_back(res);
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Failed to get remedial exam students: " << e.what() << std::endl;
+    }
+
+    return students;
+}
+
+std::vector<Student> Database::get_failing_students()
+{
+    std::vector<Student> students;
+
+    if (!connected)
+    {
+        std::cerr << "Not connected to database" << std::endl;
+        return students;
+    }
+
+    try
+    {
+        nanodbc::statement stmt(*conn);
+        stmt.prepare(R"(
+            WITH SubjectAverages AS (
+                SELECT s.id, s.number_in_class, s.full_name, s.date_of_birth, subj.id as subject_id, AVG(g.grade_value) as subject_avg
+                FROM students s
+                JOIN grades g ON g.student_id = s.id
+                JOIN subjects subj ON subj.id = g.subject_id
+                GROUP BY s.id, s.number_in_class, s.full_name, s.date_of_birth, subj.id
+                HAVING AVG(g.grade_value) < 3.00
+            )
+            SELECT DISTINCT id, number_in_class, full_name, date_of_birth
+            FROM SubjectAverages
+            GROUP BY id, number_in_class, full_name, date_of_birth
+            HAVING COUNT(DISTINCT subject_id) >= 3
+            ORDER BY number_in_class
+        )");
+
+        nanodbc::result result = stmt.execute();
+
+        while (result.next())
+        {
+            Student s;
+            s.id = result.get<int>("id");
+            s.number_in_class = result.get<int>("number_in_class");
+            s.full_name = result.get<std::string>("full_name");
+            s.date_of_birth = result.get<std::string>("date_of_birth");
+            students.push_back(s);
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Failed to get failing students: " << e.what() << std::endl;
+    }
+
+    return students;
+}
+
+std::vector<Student> Database::get_birthday_students()
+{
+    std::vector<Student> students;
+
+    if (!connected)
+    {
+        std::cerr << "Not connected to database" << std::endl;
+        return students;
+    }
+
+    try
+    {
+        time_t now = time(0);
+        tm *ltm = localtime(&now);
+        int current_month = ltm->tm_mon + 1;
+        int current_day = ltm->tm_mday;
+
+        nanodbc::statement stmt(*conn);
+        stmt.prepare(R"(
+            SELECT id, number_in_class, full_name, date_of_birth
+            FROM students
+            WHERE MONTH(date_of_birth) = ? AND DAY(date_of_birth) = ?
+            ORDER BY number_in_class
+        )");
+
+        stmt.bind(0, &current_month);
+        stmt.bind(1, &current_day);
+
+        nanodbc::result result = stmt.execute();
+
+        while (result.next())
+        {
+            Student s;
+            s.id = result.get<int>("id");
+            s.number_in_class = result.get<int>("number_in_class");
+            s.full_name = result.get<std::string>("full_name");
+            s.date_of_birth = result.get<std::string>("date_of_birth");
+            students.push_back(s);
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Failed to get birthday students: " << e.what() << std::endl;
+    }
+
+    return students;
 }

@@ -13,10 +13,7 @@ enum class WindowType
     ViewStudents,
     ViewSubjects,
     ViewGrades,
-    TopStudents,
-    RemedialStudents,
-    FailingStudents,
-    BirthdayStudents
+    MoreStudentsInfoWindow,
 };
 
 inline const std::map<WindowType, std::string> windowTypeToLabel = {
@@ -27,8 +24,5 @@ inline const std::map<WindowType, std::string> windowTypeToLabel = {
     {WindowType::ViewStudents, "View Students"},
     {WindowType::ViewSubjects, "View Subjects"},
     {WindowType::ViewGrades, "View Grades"},
-    {WindowType::TopStudents, "Top Students"},
-    {WindowType::RemedialStudents, "Remedial Students"},
-    {WindowType::FailingStudents, "Failing Students"},
-    {WindowType::BirthdayStudents, "Birthday Students"}
+    {WindowType::MoreStudentsInfoWindow, "More Students Info"},
 };
