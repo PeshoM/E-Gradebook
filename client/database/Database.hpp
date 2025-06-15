@@ -30,6 +30,8 @@ public:
     std::vector<GradeByClassNumberEntity> get_grades_by_class_number(int class_number);
     bool update_grade(int id, float grade_value);
     bool delete_grade(int id);
+    float get_subject_average(int class_number, const std::string &subject_name);
+    float get_overall_average(int class_number);
 
 private:
     nanodbc::connection *conn;

@@ -393,3 +393,75 @@ std::vector<GradeByClassNumberEntity> Database::get_grades_by_class_number(int c
 
     return grades;
 }
+
+float Database::get_subject_average(int class_number, const std::string &subject_name)
+{
+    if (!connected)
+    {
+        std::cerr << "Not connected to database" << std::endl;
+        return 0.0f;
+    }
+
+    try
+    {
+        nanodbc::statement stmt(*conn);
+        stmt.prepare(R"(
+            SELECT AVG(g.grade_value) as avg_grade
+            FROM students st
+            JOIN grades g ON g.student_id = st.id
+            JOIN subjects subj ON subj.id = g.subject_id
+            WHERE st.number_in_class = ? AND subj.name = ?
+        )");
+
+        stmt.bind(0, &class_number);
+        stmt.bind(1, subject_name.c_str());
+
+        nanodbc::result result = stmt.execute();
+
+        if (result.next())
+        {
+            return result.get<float>("avg_grade");
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Failed to get subject average: " << e.what() << std::endl;
+    }
+
+    return 0.0f;
+}
+
+float Database::get_overall_average(int class_number)
+{
+    if (!connected)
+    {
+        std::cerr << "Not connected to database" << std::endl;
+        return 0.0f;
+    }
+
+    try
+    {
+        nanodbc::statement stmt(*conn);
+        stmt.prepare(R"(
+            SELECT AVG(g.grade_value) as avg_grade
+            FROM students st
+            JOIN grades g ON g.student_id = st.id
+            WHERE st.number_in_class = ?
+        )");
+
+        stmt.bind(0, &class_number);
+
+        nanodbc::result result = stmt.execute();
+
+        if (result.next())
+        {
+            return result.get<float>("avg_grade");
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Failed to get overall average: " << e.what() << std::endl;
+    }
+
+    return 0.0f;
+}

@@ -9,7 +9,8 @@
 
 ViewGradesWindow::ViewGradesWindow(Database *database)
     : db(database), scroll_offset(0.f), input_active(true), class_entered(false),
-      show_modal(false), editing_grade_id(-1), show_error(false)
+      show_modal(false), editing_grade_id(-1), show_error(false),
+      subject_input_active(false), current_subject_avg(0.0f), current_overall_avg(0.0f)
 {
     if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
     {
@@ -26,15 +27,43 @@ ViewGradesWindow::ViewGradesWindow(Database *database)
     back_button_text.setFillColor(sf::Color::White);
     back_button_text.setPosition(40, 28);
 
-    class_input_box.setSize({300, 40});
+    class_input_box.setSize({250, 40});
     class_input_box.setPosition({20, 80});
     class_input_box.setFillColor(sf::Color(80, 80, 80));
 
     class_input_text.setFont(font);
-    class_input_text.setCharacterSize(24);
+    class_input_text.setCharacterSize(20);
     class_input_text.setFillColor(sf::Color::White);
     class_input_text.setPosition({25, 85});
     class_input_text.setString("Enter Class Number...");
+
+    subject_input_box.setSize({250, 40});
+    subject_input_box.setPosition({290, 80});
+    subject_input_box.setFillColor(sf::Color(80, 80, 80));
+
+    subject_input_text.setFont(font);
+    subject_input_text.setCharacterSize(20);
+    subject_input_text.setFillColor(sf::Color::White);
+    subject_input_text.setPosition({295, 85});
+    subject_input_text.setString("Enter Subject...");
+
+    subject_avg_text.setFont(font);
+    subject_avg_text.setCharacterSize(18);
+    subject_avg_text.setFillColor(sf::Color::Yellow);
+    subject_avg_text.setPosition({20, 140});
+    subject_avg_text.setString("Subject Avg: N/A");
+
+    overall_avg_text.setFont(font);
+    overall_avg_text.setCharacterSize(18);
+    overall_avg_text.setFillColor(sf::Color::Yellow);
+    overall_avg_text.setPosition({290, 140});
+    overall_avg_text.setString("Overall Avg: N/A");
+
+    no_grades_text.setFont(font);
+    no_grades_text.setCharacterSize(20);
+    no_grades_text.setFillColor(sf::Color::White);
+    no_grades_text.setString("No grades found for this student.");
+    no_grades_text.setPosition({20, 180});
 
     modal_background.setFillColor(sf::Color(0, 0, 0, 128));
     modal_window.setFillColor(sf::Color(60, 60, 100));
@@ -68,6 +97,7 @@ ViewGradesWindow::ViewGradesWindow(Database *database)
     cancel_text.setFillColor(sf::Color::White);
 
     class_input_string.clear();
+    subject_input_string.clear();
 }
 
 void ViewGradesWindow::create_row_buttons()
@@ -197,6 +227,42 @@ void ViewGradesWindow::delete_grade(int grade_id)
     }
 }
 
+void ViewGradesWindow::update_averages()
+{
+    if (!class_input_string.empty())
+    {
+        if (!grades.empty())
+        {
+            current_overall_avg = db->get_overall_average(std::stoi(class_input_string));
+
+            if (!subject_input_string.empty())
+            {
+                current_subject_avg = db->get_subject_average(std::stoi(class_input_string), subject_input_string);
+            }
+            else
+            {
+                current_subject_avg = 0.0f;
+            }
+
+            std::ostringstream ss;
+            ss << std::fixed << std::setprecision(2);
+
+            ss.str("");
+            ss << "Subject Avg: " << current_subject_avg;
+            subject_avg_text.setString(ss.str());
+
+            ss.str("");
+            ss << "Overall Avg: " << current_overall_avg;
+            overall_avg_text.setString(ss.str());
+        }
+        else
+        {
+            subject_avg_text.setString("Subject Avg: N/A");
+            overall_avg_text.setString("Overall Avg: N/A");
+        }
+    }
+}
+
 void ViewGradesWindow::handle_modal_events(sf::RenderWindow &window)
 {
     sf::Event event;
@@ -290,6 +356,16 @@ void ViewGradesWindow::handle_events(sf::RenderWindow &window, WindowType &next_
             {
                 next_window = WindowType::Menu;
             }
+            else if (class_input_box.getGlobalBounds().contains(mouse_pos))
+            {
+                input_active = true;
+                subject_input_active = false;
+            }
+            else if (subject_input_box.getGlobalBounds().contains(mouse_pos))
+            {
+                input_active = false;
+                subject_input_active = true;
+            }
             else if (class_entered)
             {
                 for (size_t i = 0; i < row_buttons.size(); ++i)
@@ -342,7 +418,31 @@ void ViewGradesWindow::handle_events(sf::RenderWindow &window, WindowType &next_
                     input_active = false;
                     class_entered = true;
                     load_grades_for_class(class_input_string);
+                    update_averages();
                 }
+            }
+        }
+        else if (subject_input_active && event.type == sf::Event::TextEntered)
+        {
+            if (event.text.unicode == BACKSPACE_UNICODE)
+            {
+                if (!subject_input_string.empty())
+                {
+                    subject_input_string.pop_back();
+                    if (subject_input_string.empty())
+                        subject_input_text.setString("Enter Subject...");
+                    else
+                        subject_input_text.setString(subject_input_string);
+                }
+            }
+            else if (event.text.unicode == ENTER_UNICODE)
+            {
+                update_averages();
+            }
+            else if (event.text.unicode >= 32 && event.text.unicode <= 126)
+            {
+                subject_input_string.push_back(static_cast<char>(event.text.unicode));
+                subject_input_text.setString(subject_input_string);
             }
         }
 
@@ -397,48 +497,48 @@ void ViewGradesWindow::render(sf::RenderWindow &window)
     window.draw(class_input_box);
     window.draw(class_input_text);
 
+    window.draw(subject_input_box);
+    window.draw(subject_input_text);
+
+    window.draw(subject_avg_text);
+    window.draw(overall_avg_text);
+
     if (class_entered)
     {
-        float table_start_y = 160.f;
-        float visible_area_top = table_start_y;
-        float visible_area_bottom = static_cast<float>(window.getSize().y);
-
-        sf::Text header_subject, header_grade, header_date;
-
-        header_subject.setFont(font);
-        header_subject.setCharacterSize(22);
-        header_subject.setFillColor(sf::Color::Yellow);
-        header_subject.setString("Subject");
-        header_subject.setPosition(30.f, 120.f);
-
-        header_grade.setFont(font);
-        header_grade.setCharacterSize(22);
-        header_grade.setFillColor(sf::Color::Yellow);
-        header_grade.setString("Grade");
-        header_grade.setPosition(300.f, 120.f);
-
-        header_date.setFont(font);
-        header_date.setCharacterSize(22);
-        header_date.setFillColor(sf::Color::Yellow);
-        header_date.setString("Date");
-        header_date.setPosition(450.f, 120.f);
-
-        window.draw(header_subject);
-        window.draw(header_grade);
-        window.draw(header_date);
-
         if (grades.empty())
         {
-            sf::Text no_grades_text;
-            no_grades_text.setFont(font);
-            no_grades_text.setCharacterSize(24);
-            no_grades_text.setFillColor(sf::Color::White);
-            no_grades_text.setString("No grades found for this class");
-            no_grades_text.setPosition(30.f, 180.f);
             window.draw(no_grades_text);
         }
         else
         {
+            float table_start_y = 180.f;
+            float visible_area_top = table_start_y;
+            float visible_area_bottom = static_cast<float>(window.getSize().y);
+
+            sf::Text header_subject, header_grade, header_date;
+
+            header_subject.setFont(font);
+            header_subject.setCharacterSize(22);
+            header_subject.setFillColor(sf::Color::Yellow);
+            header_subject.setString("Subject");
+            header_subject.setPosition(30.f, 180.f);
+
+            header_grade.setFont(font);
+            header_grade.setCharacterSize(22);
+            header_grade.setFillColor(sf::Color::Yellow);
+            header_grade.setString("Grade");
+            header_grade.setPosition(400.f, 180.f);
+
+            header_date.setFont(font);
+            header_date.setCharacterSize(22);
+            header_date.setFillColor(sf::Color::Yellow);
+            header_date.setString("Date");
+            header_date.setPosition(500.f, 180.f);
+
+            window.draw(header_subject);
+            window.draw(header_grade);
+            window.draw(header_date);
+
             for (std::size_t i = 0; i < grades.size(); ++i)
             {
                 float y_pos = table_start_y + i * row_height - scroll_offset;
@@ -453,8 +553,8 @@ void ViewGradesWindow::render(sf::RenderWindow &window)
                 window.draw(row_bg);
 
                 grades[i].subject_name.setPosition(30.f, y_pos + 10.f);
-                grades[i].grade_value.setPosition(300.f, y_pos + 10.f);
-                grades[i].grade_date.setPosition(450.f, y_pos + 10.f);
+                grades[i].grade_value.setPosition(400.f, y_pos + 10.f);
+                grades[i].grade_date.setPosition(500.f, y_pos + 10.f);
 
                 window.draw(grades[i].subject_name);
                 window.draw(grades[i].grade_value);

@@ -30,6 +30,17 @@ private:
     std::string class_input_string;
     bool input_active;
 
+    sf::RectangleShape subject_input_box;
+    sf::Text subject_input_text;
+    std::string subject_input_string;
+    bool subject_input_active;
+
+    sf::Text subject_avg_text;
+    sf::Text overall_avg_text;
+    sf::Text no_grades_text;
+    float current_subject_avg;
+    float current_overall_avg;
+
     std::vector<GradeEntry> grades;
 
     float scroll_offset;
@@ -63,6 +74,7 @@ private:
     const float button_height = 25.f;
 
     void load_grades_for_class(const std::string &class_number);
+    void update_averages();
     void reset_input();
     void handle_scroll(float delta);
     void create_row_buttons();
