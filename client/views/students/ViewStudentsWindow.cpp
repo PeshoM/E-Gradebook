@@ -13,25 +13,25 @@ ViewStudentsWindow::ViewStudentsWindow(Database *database)
 
     back_button.setSize({150, 40});
     back_button.setPosition({20, 20});
-    back_button.setFillColor(sf::Color(100, 100, 150));
+    back_button.setFillColor(sf::Color(70, 70, 130));
 
     back_button_text.setFont(font);
     back_button_text.setString("Go Back");
     back_button_text.setCharacterSize(20);
-    back_button_text.setFillColor(sf::Color::White);
+    back_button_text.setFillColor(sf::Color(220, 220, 255));
     back_button_text.setPosition(40, 28);
 
-    modal_background.setFillColor(sf::Color(0, 0, 0, 128));
-    modal_window.setFillColor(sf::Color(60, 60, 100));
+    modal_background.setFillColor(sf::Color(0, 0, 0, 180));
+    modal_window.setFillColor(sf::Color(70, 70, 130));
     modal_window.setSize({400, 300});
     modal_window.setPosition({200, 150});
 
     input_box_number.setSize({200, 30});
     input_box_name.setSize({200, 30});
     input_box_date.setSize({200, 30});
-    input_box_number.setFillColor(sf::Color(80, 80, 80));
-    input_box_name.setFillColor(sf::Color(80, 80, 80));
-    input_box_date.setFillColor(sf::Color(80, 80, 80));
+    input_box_number.setFillColor(sf::Color(90, 90, 160));
+    input_box_name.setFillColor(sf::Color(90, 90, 160));
+    input_box_date.setFillColor(sf::Color(90, 90, 160));
 
     input_text_number.setFont(font);
     input_text_name.setFont(font);
@@ -39,14 +39,14 @@ ViewStudentsWindow::ViewStudentsWindow(Database *database)
     input_text_number.setCharacterSize(18);
     input_text_name.setCharacterSize(18);
     input_text_date.setCharacterSize(18);
-    input_text_number.setFillColor(sf::Color::White);
-    input_text_name.setFillColor(sf::Color::White);
-    input_text_date.setFillColor(sf::Color::White);
+    input_text_number.setFillColor(sf::Color(220, 220, 255));
+    input_text_name.setFillColor(sf::Color(220, 220, 255));
+    input_text_date.setFillColor(sf::Color(220, 220, 255));
 
     save_button.setSize({100, 30});
     cancel_button.setSize({100, 30});
-    save_button.setFillColor(sf::Color(100, 150, 100));
-    cancel_button.setFillColor(sf::Color(150, 100, 100));
+    save_button.setFillColor(sf::Color(90, 160, 90));
+    cancel_button.setFillColor(sf::Color(160, 90, 90));
 
     save_text.setFont(font);
     cancel_text.setFont(font);
@@ -54,13 +54,13 @@ ViewStudentsWindow::ViewStudentsWindow(Database *database)
     cancel_text.setString("Cancel");
     save_text.setCharacterSize(18);
     cancel_text.setCharacterSize(18);
-    save_text.setFillColor(sf::Color::White);
-    cancel_text.setFillColor(sf::Color::White);
+    save_text.setFillColor(sf::Color(220, 255, 220));
+    cancel_text.setFillColor(sf::Color(255, 220, 220));
 
     error_text.setFont(font);
     error_text.setString("Class number already exists!");
     error_text.setCharacterSize(16);
-    error_text.setFillColor(sf::Color::Red);
+    error_text.setFillColor(sf::Color(255, 100, 100));
 
     load_students();
 }
@@ -272,7 +272,7 @@ void ViewStudentsWindow::handle_events(sf::RenderWindow &window, WindowType &nex
             if (back_button.getGlobalBounds().contains(mouse_pos))
                 back_button.setFillColor(sf::Color(130, 130, 180));
             else
-                back_button.setFillColor(sf::Color(100, 100, 150));
+                back_button.setFillColor(sf::Color(70, 70, 130));
         }
 
         if (event.type == sf::Event::MouseButtonPressed)

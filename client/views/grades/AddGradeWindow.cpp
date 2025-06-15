@@ -14,47 +14,57 @@
 
 AddGradeWindow::AddGradeWindow(Database *db)
     : db(db),
-      back_button({20, 20}, {120, 40}, "Back"),
-      confirm_button({250, 250}, {150, 40}, "Confirm"),
-      current_step(EnterStudentNumber),
+      back_button({20, 20}, {150, 40}, "Go Back"),
+      confirm_button({20, 80}, {150, 40}, "Add Grade"),
+      selected_box_index(-1),
       show_success_message(false)
 {
-
     if (!font.loadFromFile("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"))
     {
         std::cerr << "Failed to load font.\n";
     }
 
-    input_box.setSize({300, 40});
-    input_box.setPosition({250, 150});
-    input_box.setFillColor(sf::Color(255, 255, 255, 200));
-    input_box.setOutlineColor(sf::Color::Black);
-    input_box.setOutlineThickness(2);
+    const std::string labels[] = {
+        "Student Class Number:", "Subject Name:", "Grade:"};
 
-    input_label.setFont(font);
-    input_label.setCharacterSize(18);
-    input_label.setFillColor(sf::Color::White);
-    input_label.setPosition({250, 120});
-    input_label.setString("Student Class Number:");
+    for (int i = 0; i < 3; ++i)
+    {
+        input_boxes[i].setSize({300, 40});
+        input_boxes[i].setPosition({250, 40 + i * 80});
+        input_boxes[i].setFillColor(sf::Color(90, 90, 160));
+        input_boxes[i].setOutlineColor(sf::Color(100, 100, 180));
+        input_boxes[i].setOutlineThickness(2);
 
-    input_text.setFont(font);
-    input_text.setCharacterSize(18);
-    input_text.setFillColor(sf::Color::Black);
-    input_text.setPosition({260, 160});
+        input_labels[i].setFont(font);
+        input_labels[i].setCharacterSize(18);
+        input_labels[i].setFillColor(sf::Color(220, 220, 255));
+        input_labels[i].setString(labels[i]);
+        input_labels[i].setPosition({250, 10 + i * 80});
+
+        input_texts[i].setFont(font);
+        input_texts[i].setCharacterSize(18);
+        input_texts[i].setFillColor(sf::Color(220, 220, 255));
+        input_texts[i].setPosition({260, 50 + i * 80});
+
+        input_values[i] = "";
+    }
 
     error_text.setFont(font);
-    error_text.setCharacterSize(16);
-    error_text.setFillColor(sf::Color::Red);
-    error_text.setPosition({250, 200});
+    error_text.setCharacterSize(20);
+    error_text.setFillColor(sf::Color(255, 100, 100));
+    error_text.setPosition({250, 280});
 
     students = db->get_students();
     subjects = db->get_subjects();
 }
 
-void AddGradeWindow::reset_input()
+void AddGradeWindow::reset_inputs()
 {
-    input_value.clear();
-    input_text.setString("");
+    for (int i = 0; i < 3; ++i)
+    {
+        input_values[i].clear();
+        input_texts[i].setString("");
+    }
     error_text.setString("");
 }
 
@@ -87,76 +97,67 @@ std::string AddGradeWindow::get_current_date()
     return oss.str();
 }
 
-void AddGradeWindow::try_advance_step(WindowType &next_window)
+void AddGradeWindow::submit_grade()
 {
     error_text.setString("");
 
-    switch (current_step)
+    // Validate student number
+    int student_number;
+    try
     {
-    case EnterStudentNumber:
-        try
+        student_number = std::stoi(input_values[0]);
+        if (!student_exists(student_number))
         {
-            student_number = std::stoi(input_value);
-            if (!student_exists(student_number))
-            {
-                error_text.setString("Student not found.");
-                return;
-            }
-            current_step = EnterSubjectName;
-            input_label.setString("Subject Name:");
-            reset_input();
-        }
-        catch (...)
-        {
-            error_text.setString("Invalid number.");
-        }
-        break;
-
-    case EnterSubjectName:
-        subject_name = input_value;
-        if (!subject_exists(subject_name))
-        {
-            error_text.setString("Subject not found.");
+            error_text.setString("Student not found.");
             return;
         }
-        current_step = EnterGrade;
-        input_label.setString("Grade:");
-        reset_input();
-        break;
+    }
+    catch (...)
+    {
+        error_text.setString("Invalid student number.");
+        return;
+    }
 
-    case EnterGrade:
-        grade_value = std::stof(input_value);
+    // Validate subject
+    if (!subject_exists(input_values[1]))
+    {
+        error_text.setString("Subject not found.");
+        return;
+    }
+
+    // Validate grade
+    float grade_value;
+    try
+    {
+        grade_value = std::stof(input_values[2]);
         if (grade_value < 2 || grade_value > 6)
         {
             error_text.setString("Grade must be between 2 and 6");
             return;
         }
-        submit_grade();
-        current_step = Done;
-        confirm_button.set_text("Done");
-        break;
-
-    case Done:
-        next_window = WindowType::Menu;
-        break;
     }
-}
+    catch (...)
+    {
+        error_text.setString("Invalid grade value.");
+        return;
+    }
 
-void AddGradeWindow::submit_grade()
-{
+    // Round grade to 2 decimal places
     grade_value = std::round(grade_value * 100.0f) / 100.0f;
+
+    // Submit grade
     Grade grade = {student_id, subject_id, get_current_date(), grade_value};
     bool success = db->add_grade(grade);
     if (success)
     {
         show_success_message = true;
         success_message_clock.restart();
+        reset_inputs();
     }
     else
     {
         error_text.setString("Failed to add grade.");
     }
-    reset_input();
 }
 
 void AddGradeWindow::handle_events(sf::RenderWindow &window, WindowType &next_window)
@@ -179,23 +180,33 @@ void AddGradeWindow::handle_events(sf::RenderWindow &window, WindowType &next_wi
 
             if (confirm_button.is_clicked(mouse_pos, true))
             {
-                try_advance_step(next_window);
+                submit_grade();
+            }
+
+            // Check which input box was clicked
+            for (int i = 0; i < 3; ++i)
+            {
+                if (input_boxes[i].getGlobalBounds().contains(mouse_pos))
+                {
+                    selected_box_index = i;
+                    break;
+                }
             }
         }
 
-        if (event.type == sf::Event::TextEntered)
+        if (event.type == sf::Event::TextEntered && selected_box_index != -1)
         {
             if (event.text.unicode == BACKSPACE_UNICODE)
             {
-                if (!input_value.empty())
-                    input_value.pop_back();
+                if (!input_values[selected_box_index].empty())
+                    input_values[selected_box_index].pop_back();
             }
             else if (event.text.unicode < 128 && std::isprint(event.text.unicode))
             {
-                input_value += static_cast<char>(event.text.unicode);
+                input_values[selected_box_index] += static_cast<char>(event.text.unicode);
             }
 
-            input_text.setString(input_value);
+            input_texts[selected_box_index].setString(input_values[selected_box_index]);
         }
     }
 }
@@ -206,16 +217,25 @@ void AddGradeWindow::update()
 
 void AddGradeWindow::render(sf::RenderWindow &window)
 {
-    window.clear(sf::Color(50, 50, 90));
+    window.clear(sf::Color(40, 40, 80));
 
     back_button.draw(window);
     confirm_button.draw(window);
-    window.draw(input_box);
-    window.draw(input_label);
-    window.draw(input_text);
+
+    for (int i = 0; i < 3; ++i)
+    {
+        window.draw(input_boxes[i]);
+        window.draw(input_labels[i]);
+        window.draw(input_texts[i]);
+    }
 
     if (!error_text.getString().isEmpty())
     {
+        // Center the error text
+        sf::FloatRect textRect = error_text.getLocalBounds();
+        error_text.setOrigin(textRect.left + textRect.width / 2.0f,
+                             textRect.top + textRect.height / 2.0f);
+        error_text.setPosition(window.getSize().x / 2.0f, 280);
         window.draw(error_text);
     }
 
@@ -226,7 +246,7 @@ void AddGradeWindow::render(sf::RenderWindow &window)
             sf::Text success_text;
             success_text.setFont(font);
             success_text.setCharacterSize(22);
-            success_text.setFillColor(sf::Color::Green);
+            success_text.setFillColor(sf::Color(90, 160, 90));
             success_text.setString("Grade added successfully!");
 
             sf::FloatRect textRect = success_text.getLocalBounds();

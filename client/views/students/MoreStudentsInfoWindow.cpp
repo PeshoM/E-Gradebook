@@ -17,12 +17,12 @@ void MoreStudentsInfoWindow::setup_buttons()
 {
     back_button.setSize({150, 40});
     back_button.setPosition({20, 20});
-    back_button.setFillColor(sf::Color(100, 100, 150));
+    back_button.setFillColor(sf::Color(70, 70, 130));
 
     back_button_text.setFont(font);
     back_button_text.setString("Go Back");
     back_button_text.setCharacterSize(20);
-    back_button_text.setFillColor(sf::Color::White);
+    back_button_text.setFillColor(sf::Color(220, 220, 255));
     back_button_text.setPosition(40, 28);
 
     float button_width = 400;
@@ -33,19 +33,19 @@ void MoreStudentsInfoWindow::setup_buttons()
 
     top_students_button.setSize({button_width, button_height});
     top_students_button.setPosition({start_x, start_y});
-    top_students_button.setFillColor(sf::Color(70, 70, 110));
+    top_students_button.setFillColor(sf::Color(70, 70, 130));
 
     remedial_exam_button.setSize({button_width, button_height});
     remedial_exam_button.setPosition({start_x, start_y + button_height + spacing});
-    remedial_exam_button.setFillColor(sf::Color(70, 70, 110));
+    remedial_exam_button.setFillColor(sf::Color(70, 70, 130));
 
     failing_students_button.setSize({button_width, button_height});
     failing_students_button.setPosition({start_x, start_y + 2 * (button_height + spacing)});
-    failing_students_button.setFillColor(sf::Color(70, 70, 110));
+    failing_students_button.setFillColor(sf::Color(70, 70, 130));
 
     birthday_students_button.setSize({button_width, button_height});
     birthday_students_button.setPosition({start_x, start_y + 3 * (button_height + spacing)});
-    birthday_students_button.setFillColor(sf::Color(70, 70, 110));
+    birthday_students_button.setFillColor(sf::Color(70, 70, 130));
 }
 
 void MoreStudentsInfoWindow::setup_text()
@@ -53,37 +53,37 @@ void MoreStudentsInfoWindow::setup_text()
     title_text.setFont(font);
     title_text.setString("More Student Info");
     title_text.setCharacterSize(24);
-    title_text.setFillColor(sf::Color::White);
+    title_text.setFillColor(sf::Color(220, 220, 255));
     title_text.setPosition({350, 40});
 
     top_students_text.setFont(font);
     top_students_text.setString("Top Students");
     top_students_text.setCharacterSize(20);
-    top_students_text.setFillColor(sf::Color::White);
+    top_students_text.setFillColor(sf::Color(220, 220, 255));
     top_students_text.setPosition({70, 115});
 
     remedial_exam_text.setFont(font);
     remedial_exam_text.setString("Remedial Exam Students");
     remedial_exam_text.setCharacterSize(20);
-    remedial_exam_text.setFillColor(sf::Color::White);
+    remedial_exam_text.setFillColor(sf::Color(220, 220, 255));
     remedial_exam_text.setPosition({70, 185});
 
     failing_students_text.setFont(font);
     failing_students_text.setString("Failing Students (3+ subjects)");
     failing_students_text.setCharacterSize(20);
-    failing_students_text.setFillColor(sf::Color::White);
+    failing_students_text.setFillColor(sf::Color(220, 220, 255));
     failing_students_text.setPosition({70, 255});
 
     birthday_students_text.setFont(font);
     birthday_students_text.setString("Today's Birthdays");
     birthday_students_text.setCharacterSize(20);
-    birthday_students_text.setFillColor(sf::Color::White);
+    birthday_students_text.setFillColor(sf::Color(220, 220, 255));
     birthday_students_text.setPosition({70, 325});
 
     no_students_text.setFont(font);
     no_students_text.setString("No students found");
     no_students_text.setCharacterSize(20);
-    no_students_text.setFillColor(sf::Color::White);
+    no_students_text.setFillColor(sf::Color(220, 220, 255));
     no_students_text.setPosition({350, 200});
 }
 

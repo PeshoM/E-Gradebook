@@ -23,19 +23,19 @@ AddSubjectWindow::AddSubjectWindow(Database *database)
     {
         input_boxes[i].setSize({300, 40});
         input_boxes[i].setPosition({250, 40 + i * 80});
-        input_boxes[i].setFillColor(sf::Color(255, 255, 255, 200));
-        input_boxes[i].setOutlineColor(sf::Color::Black);
+        input_boxes[i].setFillColor(sf::Color(90, 90, 160));
+        input_boxes[i].setOutlineColor(sf::Color(100, 100, 180));
         input_boxes[i].setOutlineThickness(2);
 
         input_labels[i].setFont(Button::font);
         input_labels[i].setCharacterSize(18);
-        input_labels[i].setFillColor(sf::Color::White);
+        input_labels[i].setFillColor(sf::Color(220, 220, 255));
         input_labels[i].setString(labels[i]);
         input_labels[i].setPosition({250, 10 + i * 80});
 
         input_texts[i].setFont(Button::font);
         input_texts[i].setCharacterSize(18);
-        input_texts[i].setFillColor(sf::Color::Black);
+        input_texts[i].setFillColor(sf::Color(220, 220, 255));
         input_texts[i].setPosition({260, 50 + i * 80});
 
         input_values[i] = "";
@@ -73,7 +73,7 @@ void AddSubjectWindow::handle_events(sf::RenderWindow &window, WindowType &next_
 
         if (event.type == sf::Event::TextEntered && selected_box_index != -1)
         {
-            if (event.text.unicode == BACKSPACE_UNICODE) 
+            if (event.text.unicode == BACKSPACE_UNICODE)
             {
                 if (!input_values[selected_box_index].empty())
                     input_values[selected_box_index].pop_back();
@@ -102,7 +102,7 @@ void AddSubjectWindow::add_subject()
         return;
     }
 
-    Subject subject = { 0, name, teacher, room_number};
+    Subject subject = {0, name, teacher, room_number};
 
     bool success = db->add_subject(subject);
 

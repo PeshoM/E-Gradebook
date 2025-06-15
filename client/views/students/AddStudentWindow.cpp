@@ -23,19 +23,19 @@ AddStudentWindow::AddStudentWindow(Database *database)
     {
         input_boxes[i].setSize({300, 40});
         input_boxes[i].setPosition({250, 40 + i * 80});
-        input_boxes[i].setFillColor(sf::Color(255, 255, 255, 200));
-        input_boxes[i].setOutlineColor(sf::Color::Black);
+        input_boxes[i].setFillColor(sf::Color(90, 90, 160));
+        input_boxes[i].setOutlineColor(sf::Color(100, 100, 180));
         input_boxes[i].setOutlineThickness(2);
 
         input_labels[i].setFont(Button::font);
         input_labels[i].setCharacterSize(18);
-        input_labels[i].setFillColor(sf::Color::White);
+        input_labels[i].setFillColor(sf::Color(220, 220, 255));
         input_labels[i].setString(labels[i]);
         input_labels[i].setPosition({250, 10 + i * 80});
 
         input_texts[i].setFont(Button::font);
         input_texts[i].setCharacterSize(18);
-        input_texts[i].setFillColor(sf::Color::Black);
+        input_texts[i].setFillColor(sf::Color(220, 220, 255));
         input_texts[i].setPosition({260, 50 + i * 80});
 
         input_values[i] = "";
@@ -43,7 +43,7 @@ AddStudentWindow::AddStudentWindow(Database *database)
 
     date_format_label.setFont(Button::font);
     date_format_label.setCharacterSize(14);
-    date_format_label.setFillColor(sf::Color(200, 200, 200));
+    date_format_label.setFillColor(sf::Color(180, 180, 200));
     date_format_label.setString("Format: YYYY-MM-DD");
     date_format_label.setPosition(250, 40 + 2 * 80 + 45);
 }
@@ -106,7 +106,7 @@ void AddStudentWindow::add_student()
 
         std::string db_error;
 
-        Student st = { 0, number_in_class, full_name, date_of_birth};
+        Student st = {0, number_in_class, full_name, date_of_birth};
 
         bool success = db->add_student(st);
 

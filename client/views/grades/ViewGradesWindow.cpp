@@ -19,73 +19,73 @@ ViewGradesWindow::ViewGradesWindow(Database *database)
 
     back_button.setSize({150, 40});
     back_button.setPosition({20, 20});
-    back_button.setFillColor(sf::Color(100, 100, 150));
+    back_button.setFillColor(sf::Color(70, 70, 130));
 
     back_button_text.setFont(font);
     back_button_text.setString("Go Back");
     back_button_text.setCharacterSize(20);
-    back_button_text.setFillColor(sf::Color::White);
+    back_button_text.setFillColor(sf::Color(220, 220, 255));
     back_button_text.setPosition(40, 28);
 
     class_input_box.setSize({250, 40});
     class_input_box.setPosition({20, 80});
-    class_input_box.setFillColor(sf::Color(80, 80, 80));
+    class_input_box.setFillColor(sf::Color(90, 90, 160));
 
     class_input_text.setFont(font);
     class_input_text.setCharacterSize(20);
-    class_input_text.setFillColor(sf::Color::White);
+    class_input_text.setFillColor(sf::Color(220, 220, 255));
     class_input_text.setPosition({25, 85});
     class_input_text.setString("Enter Class Number...");
 
     subject_input_box.setSize({250, 40});
     subject_input_box.setPosition({290, 80});
-    subject_input_box.setFillColor(sf::Color(80, 80, 80));
+    subject_input_box.setFillColor(sf::Color(90, 90, 160));
 
     subject_input_text.setFont(font);
     subject_input_text.setCharacterSize(20);
-    subject_input_text.setFillColor(sf::Color::White);
+    subject_input_text.setFillColor(sf::Color(220, 220, 255));
     subject_input_text.setPosition({295, 85});
     subject_input_text.setString("Enter Subject...");
 
     subject_avg_text.setFont(font);
     subject_avg_text.setCharacterSize(18);
-    subject_avg_text.setFillColor(sf::Color::Yellow);
+    subject_avg_text.setFillColor(sf::Color(220, 220, 255));
     subject_avg_text.setPosition({20, 140});
     subject_avg_text.setString("Subject Avg: N/A");
 
     overall_avg_text.setFont(font);
     overall_avg_text.setCharacterSize(18);
-    overall_avg_text.setFillColor(sf::Color::Yellow);
+    overall_avg_text.setFillColor(sf::Color(220, 220, 255));
     overall_avg_text.setPosition({290, 140});
     overall_avg_text.setString("Overall Avg: N/A");
 
     no_grades_text.setFont(font);
     no_grades_text.setCharacterSize(20);
-    no_grades_text.setFillColor(sf::Color::White);
+    no_grades_text.setFillColor(sf::Color(220, 220, 255));
     no_grades_text.setString("No grades found for this student.");
     no_grades_text.setPosition({20, 180});
 
-    modal_background.setFillColor(sf::Color(0, 0, 0, 128));
-    modal_window.setFillColor(sf::Color(60, 60, 100));
+    modal_background.setFillColor(sf::Color(0, 0, 0, 180));
+    modal_window.setFillColor(sf::Color(70, 70, 130));
     modal_window.setSize({400, 200});
     modal_window.setPosition({200, 150});
 
     input_box_grade.setSize({200, 30});
-    input_box_grade.setFillColor(sf::Color(80, 80, 80));
+    input_box_grade.setFillColor(sf::Color(90, 90, 160));
 
     input_text_grade.setFont(font);
     input_text_grade.setCharacterSize(18);
-    input_text_grade.setFillColor(sf::Color::White);
+    input_text_grade.setFillColor(sf::Color(220, 220, 255));
 
     error_text.setFont(font);
     error_text.setString("Invalid grade value!");
     error_text.setCharacterSize(16);
-    error_text.setFillColor(sf::Color::Red);
+    error_text.setFillColor(sf::Color(255, 100, 100));
 
     save_button.setSize({100, 30});
     cancel_button.setSize({100, 30});
-    save_button.setFillColor(sf::Color(100, 150, 100));
-    cancel_button.setFillColor(sf::Color(150, 100, 100));
+    save_button.setFillColor(sf::Color(90, 160, 90));
+    cancel_button.setFillColor(sf::Color(160, 90, 90));
 
     save_text.setFont(font);
     cancel_text.setFont(font);
@@ -93,8 +93,8 @@ ViewGradesWindow::ViewGradesWindow(Database *database)
     cancel_text.setString("Cancel");
     save_text.setCharacterSize(18);
     cancel_text.setCharacterSize(18);
-    save_text.setFillColor(sf::Color::White);
-    cancel_text.setFillColor(sf::Color::White);
+    save_text.setFillColor(sf::Color(220, 255, 220));
+    cancel_text.setFillColor(sf::Color(255, 220, 220));
 
     class_input_string.clear();
     subject_input_string.clear();
@@ -346,7 +346,7 @@ void ViewGradesWindow::handle_events(sf::RenderWindow &window, WindowType &next_
             if (back_button.getGlobalBounds().contains(mouse_pos))
                 back_button.setFillColor(sf::Color(130, 130, 180));
             else
-                back_button.setFillColor(sf::Color(100, 100, 150));
+                back_button.setFillColor(sf::Color(70, 70, 130));
         }
 
         if (event.type == sf::Event::MouseButtonPressed)
